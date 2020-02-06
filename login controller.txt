@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
+use App\User;
+
+class LoginController extends Controller
+{
+    public function showLoginForm(){
+        return view('auth.login');
+
+    }
+
+    public function login(Request $request){
+
+        $this->validateLogin($request);
+ 
+        $this->updateLogin($request);
+    
+        if (Auth::attempt(['usuario' => $request->usuario,'password' => $request->password,'condicion'=>1])){
+
+            return redirect()->route('main');
+
+        }
+    
+        return back()->withErrors(['usuario' => trans('auth.failed')]);
+
+    }   
+        
+        protected function validateLogin(Request $request){
+            $this->validate($request,[
+                'usuario' => 'required|string',
+                'password' => 'required|string'
+            ]);
+        }
+
+        protected function updateLogin(Request $request){
+
+            // Seleccionamos el usuario con el ID 1
+            $usuario = User::find(1);
+
+            // Editamos el password, esta vez guardando un hash del mismo
+            $usuario->password = Hash::make('Josue2019');
+
+            // Guardamos los cambios
+            $usuario->save();
+        }
+
+
+    
+}
